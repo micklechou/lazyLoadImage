@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>lazyImg</title>
+    <style>
+        *{
+            margin: 0px;
+            padding: 0px;
+            text-decoration: none;
+            color: #000;
+            font-size: 15px;
+        }
+        .box_all{
+            
+            margin:  0px 10px;
+            list-style: none;
+            max-width: 420px;
+
+            
+        }
+        .box_all li{
+            display: block;
+            float: left;
+            border-bottom: 1px solid #e4e4e4;
+        }
+            /* .box_all li:nth-last-child(1){
+                border-bottom: none;
+            } */
+        .box_all li a {
+            position:relative;
+           display: block;
+           padding: 10px 0px;
+        }
+
+        .box_all li a .good{
+            position: absolute;
+            background: url("image/frown.png") no-repeat center center #eeeeee;
+            height: 102px;
+            width: 158px;
+        }
+        .box_all li a .good img{
+           height: 100%;
+           width:100%;
+           display: none;
+        }
+        .box_all .good{
+            display: inline-block;
+            left: 0px;
+            top:10px;
+        }
+   
+        .box_all .content{
+            margin-left: 178px;
+        }
+        .box_all .content p{
+            height: 80px;
+            line-height: 25px;
+            color :#555;
+            overflow: hidden;
+            
+        }
+        .box_all .content span{
+            display: block;
+            line-height: 20px;
+            font-size: 13px;
+            color: #999;
+            text-indent: 30px;
+            background: url("image/13.jpg") no-repeat left center;  
+            background-size: 20px;
+        }
+        
+    </style>
+    <script src="mytools.js"></script>
+</head>
+<body>
+    <ul class="box_all">
+        <!-- <li>
+            <a href="javascript:;">
+            <div class="good"><img src="image/1.jpg"></div>
+            <div class="content">
+                <p>别猜了，他就是不喜欢你，今晚上这热搜有毒呀，句句扎心。</p>
+                <span>12366</span>
+            </div>
+            </a>
+        </li>
+        <li>
+                <a href="javascript:;">
+                <div class="good"><img src="image/1.jpg"></div>
+                <div class="content">
+                    <p>别猜了，他就是不喜欢你，今晚上这热搜有毒呀，句句扎心。</p>
+                    <span>12366</span>
+                </div>
+                </a>
+            </li>
+            <li>
+                    <a href="javascript:;">
+                    <div class="good"><img src="image/1.jpg"></div>
+                    <div class="content">
+                        <p>别猜了，他就是不喜欢你，今晚上这热搜有毒呀，句句扎心。</p>
+                        <span>12366</span>
+                    </div>
+                    </a>
+                </li> -->
+    </ul>
+</body>
+</html>
+<script>
+
+var lazyImg = (function(){//利用高级单例模式
+    var _result = null
+    function ajaxDate(){ // 通过ajax获取数据
+        var xhr =new XMLHttpRequest()
+        xhr.open("get","date.json",false)
+        xhr.onreadystatechange =function(){
+        if(xhr.readyState ==4 && xhr.status ==200){
+         _result = JSON.parse(xhr.responseText)
+        }}
+        xhr.send()
+    }
+    function contextShow(){//根据数据展现页面内容
+        if(!_result){return}
+        var str =''
+        for(let i = 0;i<_result.length;i++){
+        str +=
+        `<li>
+        <a href="javascript:;">
+        <div class="good"><img date-img =${_result[i].image}></div>
+        <div class="content">
+        <p>${_result[i].tittle}</p>
+        <span>${_result[i].tipnum}</span>
+        </div>
+        </a>
+        </li>
+        `}
+        var ulbox = document.getElementsByClassName("box_all")[0]
+        ulbox.innerHTML =str
+    }
+    function computed(){ // 计算图片的值,根据值进行图片加载
+      var imgLis = document.getElementsByTagName("img")
+      for(let i = 0;i<imgLis.length;i++){
+          var imgbox = imgLis[i].parentNode;
+          if(imgLis.eq){continue}
+          var imgboxLength =imgbox.offsettop() +imgbox.offsetHeight
+          var htmlHeight = document.documentElement.clientHeight ||document.body.clientHeight
+          var htmlLenght =  htmlHeight +document.documentElement.scrollTop
+          if(htmlLenght>=imgboxLength){
+            loadImg(imgLis[i])
+          }
+      }
+    }
+    function loadImg(thisImg){ //对传进来的单张图片进行懒加载
+        thisImg.eq = true //通过自定义属性避免重复处理
+         var temp = new Image()
+         temp.src = thisImg.getAttribute("date-img")
+         temp.onload= function(){
+            thisImg.src =temp.src
+            thisImg.style.display = "block"
+            temp = null}
+    }
+    return{
+        init:function(){
+            ajaxDate()
+            contextShow()
+            window.onload= computed
+            window.onscroll = computed
+    
+         
+        }
+    }
+})()
+lazyImg.init()
+</script>
