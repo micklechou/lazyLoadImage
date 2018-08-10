@@ -77,6 +77,13 @@
                 }
             }
         }
+
+        HTMLElement.prototype.scrolltop = function(){
+            return document.documentElement.scrollTop || document.body.scrollTop
+        }
+        HTMLElement.prototype.scrollleft = function(){
+            return document.documentElement.scrollLeft || document.body.scrollLeft
+        }
       Object.prototype.mymatch = function mymatch(){
           // 模仿写了个作用不大 直接用match即可
           var temp  = arguments[0]||/^/
